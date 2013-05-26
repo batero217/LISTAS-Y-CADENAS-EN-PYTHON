@@ -1,0 +1,127 @@
+CADENAS EN PYTHON
+DEFINIENDO CADENAS
+En Python tenemos varias formas ligeramente diferentes de definir cadenas. La forma más común es escribirlas entre comillas dobles (“):
+cadena = "hola"
+También pueden utilizarse comillas simples (‘), no hay diferencia entre las cadenas delimitadas con ” o ‘.
+Por razones obvias, no podemos incluir en la cadena una comilla del mismo tipo que la que se utiliza para definirla, Python no sabrá dónde termina realmente:
+>>> mi_cadena = "hola "amigo" "
+  File "", line 1
+    mi_cadena = "hola "mundo" "
+                           ^
+SyntaxError: invalid syntax
+Una forma posible de evitar esto es delimitar la cadena con comillas simples si sabemos que contendrá comillas dobles y delimitarla con comillas dobles si sabemos que contendrá comillas simples.
+Tampoco podemos incluir saltos de línea en la cadena:
+>>> mi_cadena = "hola
+  File "", line 1
+    mi_cadena = "hola
+                     ^
+SyntaxError: EOL while scanning string literal
+Para solucionar esto, tenemos la opción de utilizar secuencias de escape. Las secuencias de escape permiten introducir caracteres especiales, escapándolos(forzándolos a ser caracteres sin significado especial) con una contrabarra (\) delante. La secuencia de escape para un salto de línea es “\n”:
+>>> print "hola \n \" mundo \" " # los espacios antes y después de \n no son necesarios, se agregan por claridad
+hola 
+" mundo " 
+Para solucionar el problema de los saltos de línea o las comillas, podemos utilizar también una tercera vía: las cadenas en Python pueden delimitarse con bloques de tres comillas dobles (“”") o tres apóstrofes (”’). Saltos de línea y comillas individuales están permitidos en este tipo de cadenas.
+>>> print """hola
+"mundo" """
+hola 
+"mundo" 
+Además de todo esto, hay dos modificadores (tres en Python 3) que cambian la forma en la que la cadena es interpretada, anteponiéndolos a la cadena misma:
+•  ‘r’ fuerza a que las secuencias de escape no sean interpretadas:r'hola\nmundo' no convierte “\n” a un salto de línea.
+•	‘u’ fuerza a que la cadena sea considerada una cadena Unicode, esto habilita algunas secuencias de escape extras y cambia la codificación que será utilizada para la cadena.
+Podemos encontrar más detalles sobre los modificadores, las cadenas de escape, y en general sobre cómo se definen las cadenas en Python, en la documentación sobre Lexical Analysis – String Literals.
+INMUTABLES
+En Python, así como en Java y otros lenguajes, las cadenas son inmutables (sus elementos no se pueden modificar). Si se requieren modificaciones, se debe construir una cadena nueva (muchas veces esto lo hace automáticamente el intérprete de Python). Ejemplo:
+>>> cadena = "Hola"
+>>> cadena[2] = "a"
+Traceback (most recent call last):
+  File "", line 1, in 
+TypeError: 'str' object does not support item assignment
+>>> print cadena[:2] + 'a' + cadena[3] # se crea una cadena nueva a partir de la original
+Hoaa
+MÉTODOS DE CADENAS
+Además de la sintaxis de subíndices y rebanadas (discutidas en el capítulo anterior sobre Secuencias), las cadenas en Python tienen algunos métodos para operaciones comunes (búsqueda y reemplazo, por ejemplo).
+BÚSQUEDA
+Para buscar una subcadena (o un caracter) en una cadena, Python nos ofrece varias alternativas. Si solamente necesitamos saber si una cadena contiene cierto caracter o cierta subcadena, usamos el operador in:
+>>> if 'la' in 'hola':
+...     print '¡Está!'
+...
+¡Está!
+Si necesitamos saber además la posición en la que se encuentra la subcadena, usamos los métodos index() o find(). La diferencia entre ambos es que, si no se encuentra la subcadena, find() devuelve -1, mientras que index() lanza una excepción de tipo ValueError. Ejemplos:
+
+>>> cadena = "hola"
+>>> cadena.find('ha') # 'ha' no está en 'hola', find() retorna -1
+-1
+>>> cadena.index('ha')           # index() lanza una excepción
+Traceback (most recent call last):
+  File "", line 1, in 
+ValueError: substring not found
+>>> cadena.index('a')
+3
+>>> cadena.find('a') # si la cadena está, tanto index() como find() funcionan igual
+3
+>>> if cadena.find('ha') == -1:
+...     print 'No encontrada'
+...
+No encontrada
+>>> try:
+...     cadena.index('ha')
+... except ValueError:
+...     print 'No encontrada'
+...
+No encontrada
+Un uso común de ambos métodos es obtener toda la cadena desde el principio hasta la primer ocurrencia de cierta subcadena:
+
+>>> # guardamos en pos_la la posición de 'la' en 'hola' (tercer caracter)
+>>> pos_la = 'hola'.find('la')
+>>> # pedimos a Python imprimir la cadena 'hola' desde el principio hasta el tercer caracter (sin incluirlo)
+>>> print 'hola'[:pos_la]
+ho
+Finalmente, tanto index como find aceptan parámetros que restringen la búsqueda a cierto tramo de la cadena: en vez de buscar desde el principio y hasta el final. El segundo argumento del método indica desde qué posición comenzar a buscar y el tercero indica en qué posición terminar la búsqueda.
+Para ejemplificar, busquemos todas las ocurrencias de la letra e en una cadena cualquiera (nota: hay mejores maneras de hacer esto, ¡lo siguiente es solamente un ejemplo!)
+
+cadena = '¡La mejor Guía de Python está en Maestros del Web!'
+lista = []
+pos_inicial = -1
+try:
+    while True:
+        # cada vez buscamos desde un caracter más adelante de
+        # la última ocurrencia encontrada
+        pos_inicial = cadena.index('e', pos_inicial+1)
+        lista.append(pos_inicial)
+except ValueError: # cuando ya no se encuentre la letra
+    print 'Posiciones de la letra "e" en la cadena:', lista
+
+Posiciones de la letra "e" en la cadena: [6, 18, 27, 33, 38, 46, 50]
+REEMPLAZO DE TEXTO
+Otra operación común es reemplazar una parte de una cadena por otra. En Python esto lo hacemos con el método replace:
+>>> cadena = "Esto será reemplazado: hola"
+>>> print cadena.replace('hola', 'mundo')
+Esto será reemplazado: mundo
+Notar que, como las cadenas son inmutables, el método replace devuelve una nueva cadena con el texto reemplazado, la cadena original (en el ejemplo,cadena) queda intacta.
+DIVISIÓN EN TROZOS
+Supongamos que tenemos una cadena que contiene una fecha, en formato día/mes/año. Podemos obtener fácilmente cada trozo de la cadena (cada dato de la fecha) utilizando el método split. Este método divide a la cadena en trozos, cortando cada trozo en cada ocurrencia de un separador, que se pasa como argumento.
+>>> fecha = '17/05/2012'
+>>> datos = fecha.split('/') # separamos la cadena por /
+>>> print datos
+['17', '05', '2012']         # la lista contiene los trozos, sin el separador
+>>> print 'día:', datos[0], 'mes:', datos[1], 'año:', datos[2]
+día: 17 mes: 05 año: 2012
+Si no le damos a split un separador, la cadena será separada por espacios. Esto puede servir para obtener todas las palabras de una oración:
+>>> "¡La mejor Guía de Python está en Maestros del Web!".split()
+['¡La', 'mejor', 'Guía', 'de', 'Python', 'está', 'en', 'Maestros', 'del', 'Web!']
+La operación inversa (convertir una lista a cadena), se hace con el método join, que vimos en el capítulo sobre Secuencias. Una advertencia a quienes programen en otros lenguajes: la operación join se define usualmente como una operación de la lista, que toma una cadena como argumento y la usa como delimitador. En Python, sin embargo, join es una operación de la cadena y toma una lista como argumento.
+Como ejemplo, volvamos a unir la cadena de fecha, con diferentes caracteres delimitadores:
+>>> fecha = "17/05/2012"
+>>> lista = fecha.split("/")
+>>> print lista
+['17', '05', '2012']
+>>> print "-".join(lista)
+17-05-2012
+>>> print " ".join(lista)
+17 05 2012
+>>> print ", ".join(lista)
+17, 05, 2012
+Notar que si bien es un ejemplo claro, sería más sencillo y eficiente hacer la sustitución sobre la cadena original con replace('/', '-').
+CONCLUSIÓN
+Hemos visto cómo realizar en Python algunas de las operaciones más comunes sobre cadenas: definición, búsqueda, reemplazo de subcadenas y separación en trozos.
+Las cadenas tienen otros métodos para operaciones varias, como por ejemplo buscar desde la derecha en vez de desde la izquierda, o convertir la cadena entera o parte de ella a mayúsculas o minúsculas. La lista completa de métodos está, como siempre, en la documentación: The string module y String methods.
